@@ -1,3 +1,4 @@
+//npm packages...
 var fs = require("fs");
 
 var keys = require("./keys.js");
@@ -10,62 +11,58 @@ var Spotify = require('node-spotify-api');
 
 var fs = require("fs");
 
- 
+var inquirer = require("inquirer");
 
-/*8. Make it so liri.js can take in one of the following commands:
+// Created a series of questions
+inquirer.prompt([
 
-   * `my-tweets`
+  {
+    type: "input",
+    name: "name",
+    message: "What is your name?"
+  },
 
-   * `spotify-this-song`
-
-   * `movie-this`
-
-   * `do-what-it-says` */
-
-var nodeArgs = process.argv;
-
-var opperator = process.argv[2]
-
-var songName = "";
-
-var movieName = "";
-
-
-for (var i = 3; i < nodeArgs.length; i++) {
-
-  if (i > 3 && i < nodeArgs.length) {
-
-    songName = songName + " " + nodeArgs[i];
-    movieName = movieName + "+" + nodeArgs[i];
-
+  {
+    type: "list",
+    name: "opperator",
+    message: "What would you like me to do for you?",
+    choices: ["Show your tweets", "Spotify a song", "IMDB a movie", "Do what ever it says"]
   }
 
-  else {
+]).then(function(answers) {
 
-    songName += nodeArgs[i];
-    movieName += nodeArgs[i];
-
+  if (answers.opperator == "Spotify a song") {
+    inquirer.prompt([
+      {
+        type: "input",
+        name: "songName",
+        message: "What song?"
+      }
+    ]).then(function(answers) {
+      songName = answers.songName;
+      spotify();
+    })
   }
-}
-
-
-switch (opperator) {
-  case "my-tweets":
+  else if (answers.opperator == "Show your tweets") {
     twitter();
-    break;
-
-  case "spotify-this-song":
-    spotify();
-    break;
-
-  case "movie-this":
-    imdb();
-    break;
-
-  case "do-what-it-says":
+  }
+  else if (answers.opperator == "Do what ever it says") {
     doWhatItSays();
-    break;
-};
+  }
+  else if (answers.opperator == "IMDB a movie") {
+    inquirer.prompt([
+      {
+        type: "input",
+        name: "movieName",
+        message: "What movie?"
+      }
+    ]).then(function(answers) {
+      movieName = answers.movieName;
+      imdb();
+    })
+  }
+
+});
 
 
 function twitter() {
@@ -100,6 +97,10 @@ function twitter() {
 
 function spotify() {
 
+  if (songName == "") {
+    songName = "The Sign";
+  }
+
   var spotify = new Spotify({
     id: keys.spotifyKeys.client_id,
     secret: keys.spotifyKeys.client_secret
@@ -131,9 +132,7 @@ function imdb() {
 
       // console.log(body);
 
-      // Parse the body of the site and recover just the imdbRating
-      // (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
-      // console.log(JSON.parse(body, null, 2));
+      // Parse the body of the site 
       console.log("Title: " + JSON.parse(body).Title);
       console.log("Year: " + JSON.parse(body).Year);
       console.log("IMDB Rating: " + JSON.parse(body).Ratings[0].Value);
@@ -143,16 +142,13 @@ function imdb() {
       console.log("Plot: " + JSON.parse(body).Plot);
       console.log("Actors: " + JSON.parse(body).Actors);
 
-
     }
   });
-
-
 
 };
 
 function doWhatItSays() {
-  
+
   // Running the readFile module that's inside of fs.
   // Stores the read information into the variable "data"
   fs.readFile("random.txt", "utf8", function(err, data) {
@@ -170,7 +166,6 @@ function doWhatItSays() {
     };
 
   });
-
 
 };
 
