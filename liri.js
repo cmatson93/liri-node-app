@@ -13,7 +13,7 @@ var fs = require("fs");
 
 var inquirer = require("inquirer");
 
-// Created a series of questions
+// Created a series of questions that will eventually determine what function to call and what data to pass into it.
 inquirer.prompt([
 
   {
@@ -64,7 +64,7 @@ inquirer.prompt([
 
 });
 
-
+//Function that retrieves the last 20 tweets from my twitter account
 function twitter() {
 	var client = new Twitter({
 	  consumer_key: keys.twitterKeys.consumer_key,
@@ -75,13 +75,13 @@ function twitter() {
 
 	var params = {
 		screen_name: 'ChristinaMatson',
-		count: 10
+		count: 20
 	};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
 	  if (!error) {
-	    // console.log(tweets);
+	    console.log(tweets.length);
 	    for (var i = tweets.length - 1; i >= 0; i--) {
-	    	console.log("tweet: "+ tweets[i].created_at + tweets[i].text);
+	    	console.log("tweet "+[i+1]+": "+ tweets[i].created_at + tweets[i].text);
 	    }
 	  
 	  }
@@ -94,7 +94,7 @@ function twitter() {
 };
 
 
-
+//Function that will hit spotify's api to get specific data back on a song.
 function spotify() {
 
   if (songName == "") {
@@ -112,15 +112,15 @@ function spotify() {
     }
    
   // console.log(data.tracks.items[0]);   
-  console.log(data.tracks.items[0].name); 
-  console.log(data.tracks.items[0].artists[0].name); 
-  console.log(data.tracks.items[0].preview_url); 
-  console.log(data.tracks.items[0].album.name); 
+  console.log("Song Title: ",data.tracks.items[0].name); 
+  console.log("Album Title: ",data.tracks.items[0].album.name); 
+  console.log("Atrist: ", data.tracks.items[0].artists[0].name); 
+  console.log("Preview link: ",data.tracks.items[0].preview_url); 
 
   });
 };
 
-
+//Function that hits imdb's api to get information about specific movie title.
 function imdb() {
 
   var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
@@ -129,8 +129,6 @@ function imdb() {
 
     // If the request is successful
     if (!error && response.statusCode === 200) {
-
-      // console.log(body);
 
       // Parse the body of the site 
       console.log("Title: " + JSON.parse(body).Title);
@@ -147,6 +145,7 @@ function imdb() {
 
 };
 
+//Function that will do what the text in the random.txt file says
 function doWhatItSays() {
 
   // Running the readFile module that's inside of fs.
